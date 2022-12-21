@@ -3,27 +3,21 @@ import os
 import cv2
 import numpy
 import argparse
+from numba import jit
 from matplotlib import pyplot as plt
 
 
-def convert_to_single_channel(img, idx):
-    new = numpy.zeros_like(img)
-    new[:, :, idx] = img[:, :, idx]
-    return new
-
-
 # Take three channels and turn to greyscale image
+@jit  # Use numba to make it run before the heat death of the universe
 def merge_to_greyscale(r, g, b):
     height, width = r.shape
-    out_image = numpy.zeros((height, width, 3), dtype=numpy.uint8)
+    out_image = numpy.zeros((height, width), dtype=numpy.uint8)
     for x in range(height):
         for y in range(width):
             grey_value = r[x][y] + g[x][y] + b[x][y]
             if grey_value > 255:
                 grey_value = 255
-            out_image[x][y][0] = grey_value
-            out_image[x][y][1] = grey_value
-            out_image[x][y][2] = grey_value
+            out_image[x][y] = grey_value
 
     return out_image
 
@@ -37,39 +31,22 @@ def preprocess(directory_name):
         bgr_img = cv2.imread(image_path)
         rgb_img = cv2.cvtColor(bgr_img, cv2.COLOR_RGB2BGR)
 
-        # Greyscale
-        grey = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2GRAY)
-
-        # Binarisation
-        # _, binary = cv2.threshold(grey, 140, 255, cv2.THRESH_BINARY_INV)
-
         # Adaptive threshold
         # adaptive = cv2.adaptiveThreshold(grey, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 11, 1)
+        r, g, b = cv2.split(rgb_img)
 
-        img_onlyR = convert_to_single_channel(rgb_img, 0)
-        img_onlyG = convert_to_single_channel(rgb_img, 1)
-        img_onlyB = convert_to_single_channel(rgb_img, 2)
+        ## Binarise each channel
+        _, r_binary = cv2.threshold(r, 210, 255, cv2.THRESH_BINARY)
+        _, g_binary = cv2.threshold(g, 210, 255, cv2.THRESH_BINARY)
+        _, b_binary = cv2.threshold(b, 255, 255, cv2.THRESH_BINARY)
 
-        # Binarise each channel
-        _, r_binary = cv2.threshold(img_onlyR, 210, 255, cv2.THRESH_BINARY)
-        _, g_binary = cv2.threshold(img_onlyG, 210, 255, cv2.THRESH_BINARY)
-        _, b_binary = cv2.threshold(img_onlyB, 255, 255, cv2.THRESH_BINARY)
-
-        # Merge the binarised channels
-        merged = merge_to_greyscale(r_binary[:, :, 0], g_binary[:, :, 1], b_binary[:, :, 2])
-
-        # Greyscale
-        #grey = cv2.cvtColor(merged, cv2.COLOR_BGR2GRAY)
-
-        # Remove horizontal lines
-        # kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 4))
-        # no_lines = 255 - cv2.morphologyEx(255 - binary, cv2.MORPH_CLOSE, kernel, iterations=1)
+        ## Merge the binarised channels
+        merged = merge_to_greyscale(r_binary, g_binary, b_binary)
 
         # contours, hierarchy = cv2.findContours(no_lines, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
         ## if last digit of hierarchy, e.g. hierarchy[0][i][3] is -1 then it's parent, we should draw only if > threshold
         # no_dots = numpy.zeros_like(no_lines)
         ## Remove contours with area below threshold (removes random dots from the background)
-        ## Gotta pay attention not to remove colon characters
         # filtered = []
         # for index, contour in enumerate(contours):
         #    area = cv2.contourArea(contour)
@@ -80,7 +57,7 @@ def preprocess(directory_name):
         # cv2.drawContours(no_dots, filtered, -1, 255, -1)
 
         titles = ['Original', 'Red', 'Green', 'Binary Red', 'Binary Green', 'Merged']
-        images = [rgb_img, img_onlyR, img_onlyG, r_binary, g_binary, merged]
+        images = [rgb_img, r, g, r_binary, g_binary, merged]
         for i in range(len(images)):
             plt.subplot(3, 3, i + 1), plt.imshow(images[i], 'gray')
             plt.title(titles[i])
