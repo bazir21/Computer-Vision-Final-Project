@@ -2,7 +2,7 @@
 import os
 import cv2 as cv
 
-def prepare_training_data(reize=True):
+def prepare_training_data(resize=True):
     # y contains the ripeness score
     y = []
 
