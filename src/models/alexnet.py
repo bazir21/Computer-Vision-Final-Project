@@ -14,15 +14,16 @@ from keras.regularizers import l2
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 
+MEMORY_LIMIT = 2048
+
+
 # https://github.com/eweill/keras-deepcv/blob/master/models/classification/alexnet.py
-def alexnet_model(img_shape=(227, 227, 3), n_classes=10, l2_reg=0.,
-                  weights=None):
+def alexnet_model(img_shape=(227, 227, 3), n_classes=10, l2_reg=0., weights=None):
     # Initialize model
     alexnet = Sequential()
 
     # Layer 1
-    alexnet.add(Conv2D(96, (11, 11), input_shape=img_shape,
-                       padding='same', kernel_regularizer=l2(l2_reg)))
+    alexnet.add(Conv2D(96, (11, 11), input_shape=img_shape, padding='same', kernel_regularizer=l2(l2_reg)))
     alexnet.add(BatchNormalization())
     alexnet.add(Activation('relu'))
     alexnet.add(MaxPooling2D(pool_size=(2, 2)))
@@ -81,9 +82,14 @@ def alexnet_model(img_shape=(227, 227, 3), n_classes=10, l2_reg=0.,
 
 
 def alexnet(x, y, retrain=False):
-
     x = np.array(x)
     y = np.array(y)
+
+    gpus = tf.config.experimental.list_physical_devices('GPU')
+
+    tf.config.experimental.set_virtual_device_configuration(gpus[0],
+                                                            [tf.config.experimental.VirtualDeviceConfiguration(
+                                                                memory_limit=MEMORY_LIMIT)])
 
     if os.path.isdir("alexnet.model"):
         model = keras.models.load_model("alexnet.model")
@@ -117,7 +123,6 @@ def alexnet(x, y, retrain=False):
         predictions = model.predict(x_test)
         mean_squared_error(y_test, predictions)
 
-
     # def parse_args():
     #     """
     #     Parse command line arguments.
@@ -135,7 +140,5 @@ def alexnet(x, y, retrain=False):
     #                           action='store_true')
     #     parser._action_groups.append(optional)
     #     return parser.parse_args()
-
-
 
     return
