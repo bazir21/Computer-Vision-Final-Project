@@ -9,6 +9,8 @@ from keras.layers.core import Dense, Dropout, Activation, Flatten
 from keras.layers.convolutional import Conv2D, MaxPooling2D, ZeroPadding2D
 from keras.layers import BatchNormalization
 from keras.regularizers import l2
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
 
 # https://github.com/eweill/keras-deepcv/blob/master/models/classification/alexnet.py
 def alexnet_model(img_shape=(224, 224, 3), n_classes=10, l2_reg=0.,
@@ -81,14 +83,21 @@ def alexnet(x, y, retrain=False):
         model = keras.models.load_model("alexnet.model")
     else:
         model = alexnet_model()
+        # ready training data
+        x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
 
         # train model
         batch_size = 128
         epochs = 20
-        history = model.fit(x, y, batch_size=batch_size, epochs=epochs, validation_split=0.1)
+        history = model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, validation_split=0.1)
         model.save("alexnet.model")
 
-    model.summary()
+        model.summary()
+
+        predicitions = model.predict(x_test)
+        mean_squared_error(y_test, predicitions)
+
+
     # def parse_args():
     #     """
     #     Parse command line arguments.
