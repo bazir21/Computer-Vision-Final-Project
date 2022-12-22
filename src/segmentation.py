@@ -2,7 +2,7 @@
 import os
 import cv2 as cv
 
-def prepare_training_data():
+def prepare_training_data(reize=True):
     # y contains the ripeness score
     y = []
 
@@ -14,7 +14,7 @@ def prepare_training_data():
     for filename in os.listdir(directory):
         image_path = os.path.join(directory, filename)
         box_path = "../data/bounding_box/" + image_path[15:-4] + ".txt"
-        ripeness, images = crop_with_box(cv.imread(image_path), box_path)
+        ripeness, images = crop_with_box(cv.imread(image_path), box_path, resize)
         x = x + images
         y = y + ripeness
         print(image_path[15:-4] + ",", end=" ")
@@ -45,7 +45,14 @@ def bounding_box_to_string_array(address):
     return boxes
 
 
-def crop_with_box(image, address):
+def resize_strawberry(image):
+    # 227 being the required size of images for AlexNet
+    dimensions = (227, 227)
+    image = cv.resize(image, dimensions, interpolation=cv.INTER_LINEAR)
+    return image
+
+
+def crop_with_box(image, address, resize):
 
     '''
     Crops each strawberry from image, given bounding box specifications.
@@ -76,7 +83,10 @@ def crop_with_box(image, address):
         # why use list() ?:
         # https://stackoverflow.com/questions/6429638/how-to-split-a-string-of-space-separated-numbers-into-integers
         details = list(map(float, box.split()))
-        cropped_images.append(crop_image(image, details[1], details[2], details[3], details[4]))
+        if resize:
+            cropped_images.append(resize_strawberry(crop_image(image, details[1], details[2], details[3], details[4])))
+        else:
+            cropped_images.append(crop_image(image, details[1], details[2], details[3], details[4]))
         ripeness_scores.append(details[0])
 
     return ripeness_scores, cropped_images
