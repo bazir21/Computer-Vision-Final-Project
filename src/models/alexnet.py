@@ -20,70 +20,116 @@ from sklearn.metrics import mean_squared_error
 # https://github.com/eweill/keras-deepcv/blob/master/models/classification/alexnet.py
 def alexnet_model(img_shape=(227, 227, 3), n_classes=10, l2_reg=0.,
                   weights=None):
-    # Initialize model
-    alexnet = Sequential()
 
-    # Layer 1
-    alexnet.add(Conv2D(96, (11, 11), input_shape=img_shape,
-                       padding='same', kernel_regularizer=l2(l2_reg)))
-    alexnet.add(BatchNormalization())
-    alexnet.add(Activation('relu'))
-    alexnet.add(MaxPooling2D(pool_size=(2, 2)))
+    model = Sequential()
 
-    # Layer 2
-    alexnet.add(Conv2D(256, (5, 5), padding='same'))
-    alexnet.add(BatchNormalization())
-    alexnet.add(Activation('relu'))
-    alexnet.add(MaxPooling2D(pool_size=(2, 2)))
+    # 1st Conv
+    model.add(Conv2D(filters=96, input_shape=img_shape, kernel_size=(11, 11), strides=(4, 4),
+                       padding='valid'))
+    model.add(BatchNormalization())
+    model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size=(3, 3), strides=(2, 2), padding='valid'))
 
-    # Layer 3
-    alexnet.add(ZeroPadding2D((1, 1)))
-    alexnet.add(Conv2D(512, (3, 3), padding='same'))
-    alexnet.add(BatchNormalization())
-    alexnet.add(Activation('relu'))
-    alexnet.add(MaxPooling2D(pool_size=(2, 2)))
+    # 2nd Conv
 
-    # Layer 4
-    alexnet.add(ZeroPadding2D((1, 1)))
-    alexnet.add(Conv2D(1024, (3, 3), padding='same'))
-    alexnet.add(BatchNormalization())
-    alexnet.add(Activation('relu'))
+    model.add(Conv2D(filters=256, kernel_size=(5, 5), strides=(1, 1), padding='valid'))
+    model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size=(3, 3), strides=(2, 2), padding='valid'))
 
-    # was able to get to here at least
-    # Layer 5
-    alexnet.add(ZeroPadding2D((1, 1)))
-    alexnet.add(Conv2D(1024, (3, 3), padding='same'))
-    alexnet.add(BatchNormalization())
-    alexnet.add(Activation('relu'))
-    alexnet.add(MaxPooling2D(pool_size=(2, 2)))
+    # 3rd
+    model.add(Conv2D(filters=384, kernel_size=(3, 3), strides=(1, 1), padding='valid'))
+    model.add(Activation('relu'))
 
-    # alexnet.summary()
-    # Layer 6
-    alexnet.add(Flatten())
-    alexnet.add(Dense(3072))
-    alexnet.add(BatchNormalization())
-    alexnet.add(Activation('relu'))
-    alexnet.add(Dropout(0.5))
+    # 4th
+    model.add(Conv2D(filters=384, kernel_size=(3, 3), strides=(1, 1), padding='valid'))
+    model.add(Activation('relu'))
 
-    #alexnet.summary()
-    # Layer 7
-    alexnet.add(Dense(4096))
-    alexnet.add(BatchNormalization())
-    alexnet.add(Activation('relu'))
-    alexnet.add(Dropout(0.5))
+    # 5th
+    model.add(Conv2D(filters=256, kernel_size=(3, 3), strides=(1, 1), padding='valid'))
+    model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size=(3, 3), strides=(2, 2), padding='valid'))
 
-    # Layer 8
-    alexnet.add(Dense(n_classes))
-    alexnet.add(BatchNormalization())
-    alexnet.add(Activation('softmax'))
+    model.add(Flatten())
 
-    if weights is not None:
-        alexnet.load_weights(weights)
+    model.add(Dense(4096, input_shape=(227 * 227 * 3,)))
+    model.add(Activation('relu'))
+    model.add(Dropout(0.4))
+
+    model.add(Dense(4096))
+    model.add(Activation('relu'))
+    model.add(Dropout(0.4))
+
+    model.add(Dense(1000))
+    model.add(Activation('softmax'))
+
+    model.summary()
+
+
+    # # Initialize model
+    # alexnet = Sequential()
+    #
+    # # Layer 1
+    # alexnet.add(Conv2D(96, (11, 11), input_shape=img_shape,
+    #                    padding='same', kernel_regularizer=l2(l2_reg)))
+    # alexnet.add(BatchNormalization())
+    # alexnet.add(Activation('relu'))
+    # alexnet.add(MaxPooling2D(pool_size=(2, 2)))
+    #
+    # # Layer 2
+    # alexnet.add(Conv2D(256, (5, 5), padding='same'))
+    # alexnet.add(BatchNormalization())
+    # alexnet.add(Activation('relu'))
+    # alexnet.add(MaxPooling2D(pool_size=(2, 2)))
+    #
+    # # Layer 3
+    # alexnet.add(ZeroPadding2D((1, 1)))
+    # alexnet.add(Conv2D(512, (3, 3), padding='same'))
+    # alexnet.add(BatchNormalization())
+    # alexnet.add(Activation('relu'))
+    # alexnet.add(MaxPooling2D(pool_size=(2, 2)))
+    #
+    # # Layer 4
+    # alexnet.add(ZeroPadding2D((1, 1)))
+    # alexnet.add(Conv2D(1024, (3, 3), padding='same'))
+    # alexnet.add(BatchNormalization())
+    # alexnet.add(Activation('relu'))
+    #
+    # # was able to get to here at least
+    # # Layer 5
+    # alexnet.add(ZeroPadding2D((1, 1)))
+    # alexnet.add(Conv2D(1024, (3, 3), padding='same'))
+    # alexnet.add(BatchNormalization())
+    # alexnet.add(Activation('relu'))
+    # alexnet.add(MaxPooling2D(pool_size=(2, 2)))
+    #
+    # # alexnet.summary()
+    # # Layer 6
+    # alexnet.add(Flatten())
+    # alexnet.add(Dense(3072))
+    # alexnet.add(BatchNormalization())
+    # alexnet.add(Activation('relu'))
+    # alexnet.add(Dropout(0.5))
+    #
+    # #alexnet.summary()
+    # # Layer 7
+    # alexnet.add(Dense(4096))
+    # alexnet.add(BatchNormalization())
+    # alexnet.add(Activation('relu'))
+    # alexnet.add(Dropout(0.5))
+    #
+    # # Layer 8
+    # alexnet.add(Dense(n_classes))
+    # alexnet.add(BatchNormalization())
+    # alexnet.add(Activation('softmax'))
+    #
+    # if weights is not None:
+    #     alexnet.load_weights(weights)
 
     # alexnet.save("alexnet.model")
 
     print("Bare Alexnet model created")
-    return alexnet
+    return model
+    #return alexnet
 
 
 def alexnet(x, y, retrain=False):
@@ -110,6 +156,8 @@ def alexnet(x, y, retrain=False):
         # Need to compile, got the following error:
         # RuntimeError: You must compile your model before training/testing. Use `model.compile(optimizer, loss)`.
         # So I used this: https://thecleverprogrammer.com/2021/12/13/alexnet-architecture-using-python/
+
+        # model.compile(loss=keras.losses.categorical_crossentropy,
         model.compile(loss='sparse_categorical_crossentropy',
                       optimizer=tf.optimizers.SGD(learning_rate=0.001),
                       metrics=['accuracy'])
