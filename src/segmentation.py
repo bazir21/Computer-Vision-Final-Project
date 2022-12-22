@@ -22,10 +22,12 @@ def prepare_training_data():
     # TODO: Save the individual strawberries to avoid this extra processing. Take those strawberries directly.
 
     # view the strawberries :)
-    for image in x:
-        cv.imshow("original", image)
-        cv.waitKey(0)
-        cv.destroyAllWindows()
+    # for image in x:
+    #     cv.imshow("original", image)
+    #     cv.waitKey(0)
+    #     cv.destroyAllWindows()
+
+    return x, y
 
 
 
