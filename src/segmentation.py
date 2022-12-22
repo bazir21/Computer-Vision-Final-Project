@@ -1,14 +1,6 @@
 
-
-# import required module
 import os
 import cv2 as cv
-
-
-
-def alexnet(x, y):
-
-
 
 def prepare_training_data():
     # y contains the ripeness score
@@ -106,4 +98,3 @@ def crop_image(image, x, y, box_width, box_height):
     y2 = y + box_height
 
     return image[round(y):round(y2), round(x):round(x2)]
-
