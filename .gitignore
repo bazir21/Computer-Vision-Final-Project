@@ -1,3 +1,5 @@
 data/images/*
 .idea/
 .idea
+src/test.py
+src/1.png
