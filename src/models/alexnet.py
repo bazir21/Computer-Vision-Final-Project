@@ -14,6 +14,9 @@ from keras.regularizers import l2
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 
+
+
+
 # https://github.com/eweill/keras-deepcv/blob/master/models/classification/alexnet.py
 def alexnet_model(img_shape=(227, 227, 3), n_classes=10, l2_reg=0.,
                   weights=None):
@@ -46,6 +49,7 @@ def alexnet_model(img_shape=(227, 227, 3), n_classes=10, l2_reg=0.,
     alexnet.add(BatchNormalization())
     alexnet.add(Activation('relu'))
 
+    # was able to get to here at least
     # Layer 5
     alexnet.add(ZeroPadding2D((1, 1)))
     alexnet.add(Conv2D(1024, (3, 3), padding='same'))
@@ -53,6 +57,7 @@ def alexnet_model(img_shape=(227, 227, 3), n_classes=10, l2_reg=0.,
     alexnet.add(Activation('relu'))
     alexnet.add(MaxPooling2D(pool_size=(2, 2)))
 
+    # alexnet.summary()
     # Layer 6
     alexnet.add(Flatten())
     alexnet.add(Dense(3072))
@@ -60,6 +65,7 @@ def alexnet_model(img_shape=(227, 227, 3), n_classes=10, l2_reg=0.,
     alexnet.add(Activation('relu'))
     alexnet.add(Dropout(0.5))
 
+    #alexnet.summary()
     # Layer 7
     alexnet.add(Dense(4096))
     alexnet.add(BatchNormalization())
@@ -97,7 +103,7 @@ def alexnet(x, y, retrain=False):
         # batch size was previous 128, but switch because of:
         # 2022-12-22 04:59:56.128030: W tensorflow/core/framework/op_kernel.cc:1745] OP_REQUIRES failed at matmul_op_impl.h:681 : RESOURCE_EXHAUSTED: OOM when allocating tensor with shape[262144,3072] and type float on /job:localhost/replica:0/task:0/device:CPU:0 by allocator cpu
         # https://github.com/tensorflow/models/issues/1993
-        batch_size = 32
+        batch_size = 1
         epochs = 20
         print("Beginning Alexnet model training")
 
