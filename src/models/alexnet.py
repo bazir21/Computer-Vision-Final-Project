@@ -1,8 +1,10 @@
 # Import necessary packages
 import argparse
 import os
+import numpy as np
 
 # Import necessary components to build LeNet
+import tensorflow as tf
 from tensorflow import keras
 from keras.models import Sequential
 from keras.layers.core import Dense, Dropout, Activation, Flatten
@@ -13,7 +15,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 
 # https://github.com/eweill/keras-deepcv/blob/master/models/classification/alexnet.py
-def alexnet_model(img_shape=(224, 224, 3), n_classes=10, l2_reg=0.,
+def alexnet_model(img_shape=(227, 227, 3), n_classes=10, l2_reg=0.,
                   weights=None):
     # Initialize model
     alexnet = Sequential()
@@ -74,10 +76,14 @@ def alexnet_model(img_shape=(224, 224, 3), n_classes=10, l2_reg=0.,
 
     # alexnet.save("alexnet.model")
 
+    print("Bare Alexnet model created")
     return alexnet
 
 
 def alexnet(x, y, retrain=False):
+
+    x = np.array(x)
+    y = np.array(y)
 
     if os.path.isdir("alexnet.model"):
         model = keras.models.load_model("alexnet.model")
@@ -85,17 +91,31 @@ def alexnet(x, y, retrain=False):
         model = alexnet_model()
         # ready training data
         x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
+        # print(x_train)
 
         # train model
-        batch_size = 128
+        # batch size was previous 128, but switch because of:
+        # 2022-12-22 04:59:56.128030: W tensorflow/core/framework/op_kernel.cc:1745] OP_REQUIRES failed at matmul_op_impl.h:681 : RESOURCE_EXHAUSTED: OOM when allocating tensor with shape[262144,3072] and type float on /job:localhost/replica:0/task:0/device:CPU:0 by allocator cpu
+        # https://github.com/tensorflow/models/issues/1993
+        batch_size = 32
         epochs = 20
+        print("Beginning Alexnet model training")
+
+        # Need to compile, got the following error:
+        # RuntimeError: You must compile your model before training/testing. Use `model.compile(optimizer, loss)`.
+        # So I used this: https://thecleverprogrammer.com/2021/12/13/alexnet-architecture-using-python/
+        model.compile(loss='sparse_categorical_crossentropy',
+                      optimizer=tf.optimizers.SGD(learning_rate=0.001),
+                      metrics=['accuracy'])
+        model.summary()
         history = model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, validation_split=0.1)
         model.save("alexnet.model")
+        print("Finished Alexnet model training")
 
         model.summary()
 
-        predicitions = model.predict(x_test)
-        mean_squared_error(y_test, predicitions)
+        predictions = model.predict(x_test)
+        mean_squared_error(y_test, predictions)
 
 
     # def parse_args():
