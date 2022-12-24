@@ -1,6 +1,7 @@
 
 import os
 import cv2 as cv
+import numpy as np
 
 def prepare_training_data(dimensions = None):
     # y contains the ripeness score
@@ -9,17 +10,42 @@ def prepare_training_data(dimensions = None):
     # contains the images
     x = []
 
-    # iterate through each file in the directory
-    directory = "../data/images/"
-    for filename in os.listdir(directory):
-        image_path = os.path.join(directory, filename)
-        box_path = "../data/bounding_box/" + image_path[15:-4] + ".txt"
-        ripeness, images = crop_with_box(cv.imread(image_path), box_path, dimensions)
-        x = x + images
-        y = y + ripeness
-        print(image_path[15:-4] + ",", end=" ")
+    # check if the resized images exist already
+    resized_file_path = "../data/resized/images/" + str(dimensions[0]) + "x" + str(dimensions[1]) + "/"
+    resized_box_file = "../data/resized/bounding_box/" + str(dimensions[0]) + "x" + str(dimensions[1]) + ".txt"
+    
+    if os.path.isdir(resized_file_path):
+        for filename in os.listdir(resized_file_path):
+            image_path = os.path.join(resized_file_path, filename)
+            x.append(cv.imread(image_path))
+        
+        y = open(resized_box_file, "r")
+        y = y.read().split(",")
+
+    else: # iterate through each file in the directory
+        directory = "../data/images/"
+        for filename in os.listdir(directory):
+            image_path = os.path.join(directory, filename)
+            box_path = "../data/bounding_box/" + image_path[15:-4] + ".txt"
+            ripeness, images = crop_with_box(cv.imread(image_path), box_path, dimensions)
+            x += images
+            y += ripeness
+
+        # write new segmented images to resized images folder
+        os.mkdir(resized_file_path)
+        for count, resized_image in enumerate(x):
+            cv.imwrite(resized_file_path + str(count + 1) + ".png", resized_image)
+
+        # write ripeness levels to txt file
+        with open(resized_box_file, "w") as f:
+            f.write(", ".join([str(i) for i in y]))
+
+
+    # print(image_path[15:-4] + ",", end=" ")
 
     # TODO: Save the individual strawberries to avoid this extra processing. Take those strawberries directly.
+    # IDK if it works or not it kinda does???!?!?!?
+    # I swear to god i feel like the first initial run through is wrong and then the second loaded time is correct
 
     # view the strawberries :)
     # for image in x:
