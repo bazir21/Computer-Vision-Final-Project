@@ -4,6 +4,8 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 
+# all ripped straight from here lol! 🥴🥴
+# https://pyimagesearch.com/2021/04/17/your-first-image-classifier-using-k-nn-to-classify-images/
 
 def knn():
     x, y = prepare_training_data(dimensions=(32, 32))
