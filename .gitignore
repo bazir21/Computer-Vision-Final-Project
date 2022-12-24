@@ -1,5 +1,10 @@
 data/images/*
+data/resized/*
 .idea/
 .idea
 src/test.py
-src/1.png
+data/other/
+src/__pycache__/
+src/alexnet.model/
+src/models/__pycache__/
+venv/
