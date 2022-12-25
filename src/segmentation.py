@@ -15,7 +15,8 @@ def prepare_training_data(dimensions = None):
     resized_ripeness_file = "../data/resized/ripeness/" + str(dimensions[0]) + "x" + str(dimensions[1]) + ".txt"
     
     if os.path.isdir(resized_file_path):
-        for filename in os.listdir(resized_file_path):
+        # horrible piece of code
+        for filename in sorted(os.listdir(resized_file_path), key=lambda f: int(''.join(filter(str.isdigit, f)))):
             image_path = os.path.join(resized_file_path, filename)
             x.append(cv.imread(image_path))
         
@@ -47,7 +48,6 @@ def prepare_training_data(dimensions = None):
         # write ripeness levels to txt file
         with open(resized_ripeness_file, "w") as f:
             f.write(", ".join([str(i) for i in y]))
-
 
     # print(image_path[15:-4] + ",", end=" ")
 
