@@ -12,15 +12,23 @@ def prepare_training_data(dimensions = None):
 
     # check if the resized images exist already
     resized_file_path = "../data/resized/images/" + str(dimensions[0]) + "x" + str(dimensions[1]) + "/"
-    resized_box_file = "../data/resized/bounding_box/" + str(dimensions[0]) + "x" + str(dimensions[1]) + ".txt"
+    resized_ripeness_file = "../data/resized/ripeness/" + str(dimensions[0]) + "x" + str(dimensions[1]) + ".txt"
     
     if os.path.isdir(resized_file_path):
         for filename in os.listdir(resized_file_path):
             image_path = os.path.join(resized_file_path, filename)
             x.append(cv.imread(image_path))
         
-        y = open(resized_box_file, "r")
-        y = y.read().split(",")
+        y = open(resized_ripeness_file, "r")
+        # Removed Bayir's shitting code:
+        # _(´ཀ`」 ∠)_
+        # y = y.read().split(",")
+
+        # Added John's cool code
+        # (•_•)
+        # ( •_•)> ⌐■-■
+        # (⌐■_■)
+        y = list(map(float, y.read().split(",")))
 
     else: # iterate through each file in the directory
         directory = "../data/images/"
@@ -37,7 +45,7 @@ def prepare_training_data(dimensions = None):
             cv.imwrite(resized_file_path + str(count + 1) + ".png", resized_image)
 
         # write ripeness levels to txt file
-        with open(resized_box_file, "w") as f:
+        with open(resized_ripeness_file, "w") as f:
             f.write(", ".join([str(i) for i in y]))
 
 
@@ -54,9 +62,6 @@ def prepare_training_data(dimensions = None):
     #     cv.destroyAllWindows()
 
     return x, y
-
-
-
 
 def bounding_box_to_string_array(address):
     '''
@@ -110,7 +115,8 @@ def crop_with_box(image, address, dimensions):
         # https://stackoverflow.com/questions/6429638/how-to-split-a-string-of-space-separated-numbers-into-integers
         details = list(map(float, box.split()))
         if dimensions is not None:
-            cropped_images.append(resize_strawberry(crop_image(image, details[1], details[2], details[3], details[4]), dimensions))
+            cropped_images.append(resize_strawberry(crop_image(image, details[1], details[2], details[3], details[4]),
+                                                    dimensions))
         else:
             cropped_images.append(crop_image(image, details[1], details[2], details[3], details[4]))
         ripeness_scores.append(details[0])
