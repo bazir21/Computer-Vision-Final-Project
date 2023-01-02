@@ -12,23 +12,17 @@ def prepare_training_data(dimensions = None):
 
     # check if the resized images exist already
     resized_file_path = "../data/resized/images/" + str(dimensions[0]) + "x" + str(dimensions[1]) + "/"
-    resized_ripeness_file = "../data/resized/ripeness/" + str(dimensions[0]) + "x" + str(dimensions[1]) + ".txt"
-    
-    if os.path.isdir(resized_file_path):
-        # horrible piece of code
+    resized_ripeness_path = os.path.join("..", "data", "resized", "ripeness")
+    os.makedirs(resized_ripeness_path, exist_ok=True)
+    resized_ripeness_file = os.path.join(resized_ripeness_path, str(dimensions[0]) + "x" + str(dimensions[1]) + ".txt")
+
+    if os.path.isdir(resized_file_path) and os.path.exists(resized_ripeness_file):
+        # Make sure file list is sorted
         for filename in sorted(os.listdir(resized_file_path), key=lambda f: int(''.join(filter(str.isdigit, f)))):
             image_path = os.path.join(resized_file_path, filename)
             x.append(cv.imread(image_path))
-        
-        y = open(resized_ripeness_file, "r")
-        # Removed Bayir's shitting code:
-        # _(´ཀ`」 ∠)_
-        # y = y.read().split(",")
 
-        # Added John's cool code
-        # (•_•)
-        # ( •_•)> ⌐■-■
-        # (⌐■_■)
+        y = open(resized_ripeness_file, "r+")
         y = list(map(float, y.read().split(",")))
 
     else: # iterate through each file in the directory
@@ -41,12 +35,12 @@ def prepare_training_data(dimensions = None):
             y += ripeness
 
         # write new segmented images to resized images folder
-        os.mkdir(resized_file_path)
+        os.makedirs(resized_file_path, exist_ok=True)
         for count, resized_image in enumerate(x):
             cv.imwrite(resized_file_path + str(count + 1) + ".png", resized_image)
 
         # write ripeness levels to txt file
-        with open(resized_ripeness_file, "w") as f:
+        with open(resized_ripeness_file, "w+") as f:
             f.write(", ".join([str(i) for i in y]))
 
     # print(image_path[15:-4] + ",", end=" ")

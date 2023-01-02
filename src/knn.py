@@ -26,9 +26,11 @@ def knn():
         y_pred = model.predict(x[test])
         accuracy.append(accuracy_score(y[test], y_pred))
 
-    dookie = np.array(accuracy).mean()
+    mean_value = np.array(accuracy).mean()
+    std = np.array(accuracy).std()
 
-    print(dookie)
+    print(f'Mean: {mean_value}')
+    print(f'STD: {std}')
 
     # x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
 
