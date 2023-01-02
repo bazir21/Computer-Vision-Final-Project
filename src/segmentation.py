@@ -2,8 +2,11 @@
 import os
 import cv2 as cv
 import numpy as np
+import time
 
 def prepare_training_data(dimensions = None):
+    print("Preparing training data...")
+
     # y contains the ripeness score
     y = []
 
@@ -16,7 +19,10 @@ def prepare_training_data(dimensions = None):
     os.makedirs(resized_ripeness_path, exist_ok=True)
     resized_ripeness_file = os.path.join(resized_ripeness_path, str(dimensions[0]) + "x" + str(dimensions[1]) + ".txt")
 
+    start_time = time.time()
+
     if os.path.isdir(resized_file_path) and os.path.exists(resized_ripeness_file):
+        print("Resized images found")
         # Make sure file list is sorted
         for filename in sorted(os.listdir(resized_file_path), key=lambda f: int(''.join(filter(str.isdigit, f)))):
             image_path = os.path.join(resized_file_path, filename)
@@ -26,6 +32,7 @@ def prepare_training_data(dimensions = None):
         y = list(map(float, y.read().split(",")))
 
     else: # iterate through each file in the directory
+        print("Generating new resized images...")
         directory = "../data/images/"
         for filename in os.listdir(directory):
             image_path = os.path.join(directory, filename)
@@ -42,6 +49,9 @@ def prepare_training_data(dimensions = None):
         # write ripeness levels to txt file
         with open(resized_ripeness_file, "w+") as f:
             f.write(", ".join([str(i) for i in y]))
+
+    time_elapsed = time.time() - start_time
+    print(f'Training data loaded, took {time_elapsed} seconds')
 
     # print(image_path[15:-4] + ",", end=" ")
 
