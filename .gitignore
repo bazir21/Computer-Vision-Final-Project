@@ -8,5 +8,5 @@ src/__pycache__/
 src/alexnet.model/
 src/models/__pycache__/
 venv/
-data/labels/*
+data/labels/
 yolov5/
