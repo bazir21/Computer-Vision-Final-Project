@@ -2,11 +2,12 @@ import numpy as np
 import seaborn as sb
 import matplotlib.pyplot as plt
 
-
 # Code for making a confusion matrix graph in the same style as YOLOv5's
 # https://github.com/ultralytics/yolov5/blob/fdc35b119ad21c7f205596dbb238f780c87040ec/utils/metrics.py#L187
 
+
 def confusion_matrix_graph(matrix, labels, save_path="confusion_matrix.png"):
+    """Generate and save confusion matrix graph. Make sure matrix is in Predicted over True format."""
     matrix[matrix < 0.005] = np.nan
     fig, ax = plt.subplots(1, 1, figsize=(12, 9), tight_layout=True)
     nc = 3
@@ -30,16 +31,3 @@ def confusion_matrix_graph(matrix, labels, save_path="confusion_matrix.png"):
     ax.set_ylabel('Predicted')
     ax.set_title('Confusion Matrix')
     fig.savefig(save_path, dpi=250)
-
-
-def main():
-    matrix = np.array([
-        [0.9959, 0.1741, 0.05736],
-        [0.003042, 0.7663, 0.2431],
-        [0.00008, 0.05953, 0.6995]
-    ])
-    confusion_matrix_graph(matrix, ["Unripe", "Partially Ripe", "Ripe"], "knn_cf.png")
-
-
-if __name__ == "__main__":
-    main()
