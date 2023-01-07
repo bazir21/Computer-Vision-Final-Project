@@ -19,15 +19,27 @@ def confusion_matrix_graph(matrix, labels, save_path="confusion_matrix.png"):
                ax=ax,
                annot=nc < 30,
                annot_kws={
-                   "size": 12},
+                   "size": 20},
                cmap='Blues',
                fmt='.2f',
                square=True,
                vmin=0.0,
                xticklabels=ticklabels,
                yticklabels=ticklabels).set_facecolor((1, 1, 1))
-    ax.set_ylabel('True')
+    ax.set_xlabel('True')
     ax.set_ylabel('Predicted')
     ax.set_title('Confusion Matrix')
     fig.savefig(save_path, dpi=250)
-    plt.show()
+
+
+def main():
+    matrix = np.array([
+        [0.9959, 0.1741, 0.05736],
+        [0.003042, 0.7663, 0.2431],
+        [0.00008, 0.05953, 0.6995]
+    ])
+    confusion_matrix_graph(matrix, ["Unripe", "Partially Ripe", "Ripe"], "knn_cf.png")
+
+
+if __name__ == "__main__":
+    main()
