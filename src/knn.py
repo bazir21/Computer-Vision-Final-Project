@@ -56,7 +56,7 @@ def main():
     conf_matrix = confusion_matrix(targets, predictions, normalize="true").T  # Transpose to be same format as YOLO
     print(np.array_str(conf_matrix, precision=3))
     # Save confusion matrix graph
-    confusion_matrix_graph(conf_matrix, "knn_confusion_matrix.png")
+    confusion_matrix_graph(conf_matrix, ["Unripe", "Partially Ripe", "Ripe"], "knn_confusion_matrix.png")
 
 
 if __name__ == "__main__":
