@@ -53,16 +53,11 @@ def preprocess(directory_name):
 
         # Remove horizontal lines
         kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 4))
-        dilated = 255 - cv2.morphologyEx(255 - merged, cv2.MORPH_OPEN, kernel, iterations=1)
+        opened = 255 - cv2.morphologyEx(255 - merged, cv2.MORPH_OPEN, kernel, iterations=1)
 
-        # dilation_size = 10
-        # element = cv2.getStructuringElement(cv2.MORPH_RECT, (2 * dilation_size + 1, 2 * dilation_size + 1),(dilation_size, dilation_size))
-        ##eroded = cv2.erode(merged, element)
-        # dilated = cv2.dilate(merged, element)
-
-        contours, hierarchy = cv2.findContours(dilated, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
+        contours, hierarchy = cv2.findContours(opened, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
         # if last digit of hierarchy, e.g. hierarchy[0][i][3] is -1 then it's parent, we should draw only if > threshold
-        no_small_bits = numpy.zeros_like(dilated)
+        no_small_bits = numpy.zeros_like(opened)
         # Remove contours with area below threshold (removes random dots from the background)
         filtered = []
         for index, contour in enumerate(contours):
@@ -74,7 +69,7 @@ def preprocess(directory_name):
         cv2.drawContours(no_small_bits, filtered, -1, 255, -1)
 
         titles = ['Original', 'Blurred', 'Red', 'Green', 'Binary Red', 'Binary Green', 'Merged', 'Dilated', 'Contoured']
-        images = [rgb_img, blurred, r, g, r_binary, g_binary, merged, dilated, no_small_bits]
+        images = [rgb_img, blurred, r, g, r_binary, g_binary, merged, opened, no_small_bits]
         for i in range(len(images)):
             plt.subplot(3, 3, i + 1), plt.imshow(images[i], 'gray')
             plt.title(titles[i])

@@ -1,8 +1,6 @@
-
 import os
+
 import cv2 as cv
-import numpy as np
-import time
 
 
 def prepare_training_data(dimensions=None):
@@ -23,14 +21,6 @@ def prepare_training_data(dimensions=None):
             x.append(cv.imread(image_path))
 
         y = open(resized_ripeness_file, "r")
-        # Removed Bayir's shitting code:
-        # _(´ཀ`」 ∠)_
-        # y = y.read().split(",")
-
-        # Added John's cool code
-        # (•_•)
-        # ( •_•)> ⌐■-■
-        # (⌐■_■)
         y = list(map(float, y.read().split(",")))
 
     else:  # iterate through each file in the directory
@@ -51,26 +41,14 @@ def prepare_training_data(dimensions=None):
         with open(resized_ripeness_file, "w") as f:
             f.write(", ".join([str(i) for i in y]))
 
-    # print(image_path[15:-4] + ",", end=" ")
-
-    # TODO: Save the individual strawberries to avoid this extra processing. Take those strawberries directly.
-    # IDK if it works or not it kinda does???!?!?!?
-    # I swear to god i feel like the first initial run through is wrong and then the second loaded time is correct
-
-    # view the strawberries :)
-    # for image in x:
-    #     cv.imshow("original", image)
-    #     cv.waitKey(0)
-    #     cv.destroyAllWindows()
-
     return x, y
 
 
 def bounding_box_to_string_array(address):
-    '''
+    """
     :param address: Address to bounding_box text fil
     :return: String array containing bounding_box details
-    '''
+    """
     boxes = []
 
     with open(address) as f:
@@ -87,15 +65,13 @@ def resize_strawberry(image, dimensions):
 
 
 def crop_with_box(image, address, dimensions):
-
-    '''
+    """
     Crops each strawberry from image, given bounding box specifications.
     :param image: Original HD image
     :param address: Location of bounding_box text file
     :return: Array of cropped images containing strawberries to bouding_box details
-    ## TODO: Implement the line below
     :return: Array of ripeness for each image
-    '''
+    """
 
     # box - bounding_box text file
     # Bounding Box - each row contains:
@@ -129,6 +105,7 @@ def crop_with_box(image, address, dimensions):
     # 0 0.65079 0.1164 0.03373 0.055556
     # 756, 1008
     # 0 491, 117.3312
+
 
 def crop_image(image, x, y, box_width, box_height):
     # img[80:280, 150:330]

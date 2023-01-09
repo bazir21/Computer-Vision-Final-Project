@@ -1,19 +1,16 @@
 # Import necessary packages
 import os
+
+import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
-import torch
-from tensorflow import keras
-from keras.models import Sequential
-from keras.layers.core import Dense, Dropout, Activation, Flatten
-from keras.layers.convolutional import Conv2D, MaxPooling2D, ZeroPadding2D
 from keras.layers import BatchNormalization
-from keras.regularizers import l2
-from sklearn.model_selection import train_test_split
-import sklearn.metrics as metrics
-
+from keras.layers.convolutional import Conv2D, MaxPooling2D
+from keras.layers.core import Dense, Dropout, Activation, Flatten
+from keras.models import Sequential
 from sklearn.metrics import confusion_matrix
-import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from tensorflow import keras
 
 MEMORY_LIMIT = 2048
 
@@ -22,7 +19,6 @@ MEMORY_LIMIT = 2048
 # https://medium.com/analytics-vidhya/multi-class-image-classification-using-alexnet-deep-learning-network-implemented-in-keras-api-c9ae7bc4c05f
 
 def alexnet_model(img_shape=(227, 227, 3), n_classes=10, l2_reg=0., weights=None):
-
     model = Sequential()
 
     # Layer 1
@@ -84,7 +80,7 @@ def alexnet(x, y, retrain=True):
     y = np.array(y)
 
     model = Sequential()
-    # What does this do?
+    # Uncomment to set a hard vmemory limit
     # gpus = tf.config.experimental.list_physical_devices('GPU')
     # tf.config.experimental.set_virtual_device_configuration(gpus[0],
     #                                                         [tf.config.experimental.VirtualDeviceConfiguration(
@@ -117,7 +113,7 @@ def alexnet(x, y, retrain=True):
 
     print("Generating confusion matrix:")
     predictions = model.predict(x_test)
-    predictions = np.argmax(predictions,axis=1)
+    predictions = np.argmax(predictions, axis=1)
 
     after_time = datetime.now()
     time_difference = after_time - current_date_and_time
@@ -159,10 +155,10 @@ def alexnet(x, y, retrain=True):
         # We want to show all ticks...
         ax.set(xticks=np.arange(cm.shape[1]),
                yticks=np.arange(cm.shape[0]),
-                xticklabels = classes, yticklabels = classes,
-        title = title,
-        ylabel = 'True label',
-        xlabel = 'Predicted label')
+               xticklabels=classes, yticklabels=classes,
+               title=title,
+               ylabel='True label',
+               xlabel='Predicted label')
 
         # Rotate the tick labels and set their alignment.
         plt.setp(ax.get_xticklabels(), rotation=45, ha="right",
@@ -186,7 +182,9 @@ def alexnet(x, y, retrain=True):
     class_names = ["Unripe", "Partially Ripe", "Ripe"]
 
     # Plotting non-normalized confusion matrix
-    plot_confusion_matrix("Confusion Matrix", y_test, predictions, classes=class_names,  title='Confusion matrix, without normalization')
-    plot_confusion_matrix("Confusion Matrix - Normalised", y_test, predictions, classes=class_names,  normalize=True, title='Normalized confusion matrix')
+    plot_confusion_matrix("Confusion Matrix", y_test, predictions, classes=class_names,
+                          title='Confusion matrix, without normalization')
+    plot_confusion_matrix("Confusion Matrix - Normalised", y_test, predictions, classes=class_names, normalize=True,
+                          title='Normalized confusion matrix')
 
     return model

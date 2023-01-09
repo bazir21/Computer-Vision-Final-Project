@@ -1,12 +1,14 @@
 import time
+
 import numpy as np
-from segmentation import prepare_training_data
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.model_selection import train_test_split, KFold
-from sklearn.metrics import classification_report, accuracy_score
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import KFold
 from sklearn.svm import LinearSVC
 
+from segmentation import prepare_training_data
+
 NUM_SPLITS = 5
+
 
 def main():
     # x is list of cropped images, y is numeric label corresponding to ripeness level
@@ -23,7 +25,7 @@ def main():
 
     for C in Cs:
         print(f"Running model with C={C}")
-        model = LinearSVC(C=C, max_iter = 10000)
+        model = LinearSVC(C=C, max_iter=10000)
         accuracy = []
 
         start_time = time.time()
@@ -47,6 +49,7 @@ def main():
     # model = KNeighborsClassifier(n_neighbors=7)
     # model.fit(x_train, y_train)
     # print(classification_report(y_test, model.predict(x_test)))
+
 
 if __name__ == "__main__":
     main()

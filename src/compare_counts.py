@@ -18,7 +18,6 @@ for filename in os.listdir(box_dir):
     if num_lines == yolo_num_lines:
         accuracy_count += 1
 
-
 print("yolo strawberries = ", yolo_strawberries)
 print("actual strawberries = ", actual_strawberries)
 

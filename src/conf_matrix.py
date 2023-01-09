@@ -1,6 +1,7 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sb
-import matplotlib.pyplot as plt
+
 
 # Code for making a confusion matrix graph in the same style as YOLOv5's
 # https://github.com/ultralytics/yolov5/blob/fdc35b119ad21c7f205596dbb238f780c87040ec/utils/metrics.py#L187
