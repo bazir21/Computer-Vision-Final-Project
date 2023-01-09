@@ -26,7 +26,7 @@ def main():
     # for metric in ["euclidean", "cosine"]:
     # print(f"Running with {metric} metric and k={k}")
 
-    k = 7
+    k = 19
     model = KNeighborsClassifier(n_neighbors=k, n_jobs=-1)
 
     # Store through each fold to calculate confusion matrix and accuracy
